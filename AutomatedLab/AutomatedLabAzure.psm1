@@ -147,11 +147,11 @@ function Add-LabAzureSubscription
     }
 
     Write-ScreenInfo -Message "Using Azure Subscription '$SubscriptionName'" -Type Info
-    $selectedSubscription = $Subscriptions | Where-Object{$_.Name -eq $SubscriptionName}
+    $selectedSubscription = $Subscriptions | Where-Object Name -eq $SubscriptionName
 
     try
     {
-        [void](Select-AzureRmSubscription -SubscriptionName $SubscriptionName -ErrorAction Stop)
+        Select-AzureRmSubscription -SubscriptionName $SubscriptionName -ErrorAction Stop | Out-Null
     }
     catch
     {
