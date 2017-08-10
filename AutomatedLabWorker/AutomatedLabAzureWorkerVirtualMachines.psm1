@@ -304,7 +304,8 @@ function New-LWAzureVM
     $lab.Name,
     $publisherName,
     $offerName,
-    $skusName `
+    $skusName,
+	$AzureRetryCount `
     -ScriptBlock {
         param
         (
@@ -327,7 +328,8 @@ function New-LWAzureVM
             [string]$LabName,
             [string]$PublisherName,
             [string]$OfferName,
-            [string]$SkusName
+            [string]$SkusName,
+			[int]$AzureRetryCount
         )
 
         $VerbosePreference = 'Continue'
@@ -351,10 +353,21 @@ function New-LWAzureVM
         Write-Verbose "Publisher: $PublisherName"
         Write-Verbose "Offer: $OfferName"
         Write-Verbose "Skus: $SkusName"
+		Write-Verbose "AzureRetryCount: $AzureRetryCount"
         Write-Verbose '-------------------------------------------------------'
                 
-        Import-AzureRmContext -Path $SubscriptionPath
-        Set-AzureRmContext -SubscriptionName $SubscriptionName
+        $i = 0
+        while (-not $azureContext -and $i -le $AzureRetryCount)
+        {
+            $azureContext = Import-AzureRmContext -Path $SubscriptionPath -ErrorVariable azureContextError
+            $i++
+            Start-Sleep -Seconds 5
+        }
+
+        if (-not $azureContext)
+        {
+            throw (New-Object System.Exception("Azure Context could not be created using the file '$SubscriptionPath'", $azureContextError.Exception))
+        }
         
         $VerbosePreference = 'Continue'
 
@@ -805,7 +818,7 @@ function Start-LWAzureVM
                 [string]$SubscriptionPath,
                 [int]$AzureRetryCount
             )
-            #retry 3 times
+
             $i = 0
             while (-not $azureContext -and $i -le $AzureRetryCount)
             {
