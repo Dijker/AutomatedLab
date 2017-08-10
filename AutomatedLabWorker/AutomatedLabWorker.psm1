@@ -329,9 +329,8 @@ function Install-LWSoftwarePackage
     }
         
     $start = Get-Date
-    Write-Verbose -Message "Starting setup of '$ProcessName' with the following command"
-    Write-Verbose -Message "`t$cmd"
-    Write-Verbose -Message "The timeout is $Timeout minutes, starting at '$start'"
+    Write-Verbose -Message "Starting setup of '$Path' with the following command"
+    Write-Verbose -Message "`t$CommandLine"
     
     $installationMethod = [System.IO.Path]::GetExtension($Path)
     $installationFile = [System.IO.Path]::GetFileName($Path)
